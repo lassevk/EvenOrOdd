@@ -19,14 +19,6 @@ jobs:
         with:
           fetch-depth: 0 # Get all history to allow automatic versioning using MinVer
 
-      # Install the .NET SDK indicated in the global.json file
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
-        env:
-          NUGET_AUTH_TOKEN: ${{secrets.NUGET_PAT}}
-
       - name: Build
         run: dotnet build --configuration Release
 
@@ -36,5 +28,5 @@ jobs:
       - name: Publish NuGet package
         run: |
           foreach ($file in Get-ChildItem -Recurse -Path . -Filter *.nupkg) {
-            dotnet nuget push $file --api-key "${{ secrets.NUGET_PAT }}" --no-symbols --skip-duplicate
+            dotnet nuget push $file --api-key "${{ secrets.NUGET_PAT }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
           }
