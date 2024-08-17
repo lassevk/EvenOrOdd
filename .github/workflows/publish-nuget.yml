@@ -23,10 +23,16 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: Test
-        run: dotnet test --no-restore --verbosity normal
+        run: dotnet test -p:CollectCoverage=true -p:CoverletOutputFormat=opencover --no-restore --verbosity normal
 
       - name: Publish NuGet package
         run: |
           foreach ($file in Get-ChildItem -Recurse -Path . -Filter *.nupkg) {
             dotnet nuget push $file --api-key "${{ secrets.NUGET_PAT }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
           }
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: lassevk/LVK.TopoSort
